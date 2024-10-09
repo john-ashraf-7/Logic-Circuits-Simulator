@@ -1,2 +1,4 @@
 # Logic-Circuits-Simulator
-Project 1 for DD1
+## First Project for DD1.
+The purpose of this project is to build an event-driven logic circuit simulator
+with a GUI for editing the circuit and showing the waveforms as a 15% bonus

@@ -12,3 +12,4 @@ wire w2;     // declaring internal wires
   or g1 (w2, w1, b); // (ab)' + b
   nor g2 (o, c, w2); // o = (c + (ab)' + b)'
   
+endmodule

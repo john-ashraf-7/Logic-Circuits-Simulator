@@ -15,3 +15,5 @@ wire w4;     // declaring internal wires
   and g2(w3, w1, b); // c'b
   and g3(w4, w2, c); // c(ab)'
   or g4(o, w3, w4); // o = c'b + c(ab)'
+
+endmodule

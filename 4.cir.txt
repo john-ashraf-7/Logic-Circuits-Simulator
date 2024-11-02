@@ -1,8 +1,0 @@
-Inputs:
-A
-B
-C
-Components:
-G0,NAND,W1,A,B
-G1,OR,W2,W1,B
-G2,NOR,W3,C,W2

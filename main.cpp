@@ -110,8 +110,8 @@ vector<vector<string>> extractGateDefinitions(const string& filename) {
 
 int main() {
     vector<vector<string>> GateDef = readLibFile("lib.lib");  // Read the gate library
-    vector<vector<string>> Circuit = extractGateDefinitions("1.cir"); // Read the circuit file
-    vector<vector<string>> events = read_stimuli_file("stimuli1.stim"); // Read the stimuli file
+    vector<vector<string>> Circuit = extractGateDefinitions("InputFiles/circ_1.v"); // Read the circuit file
+    vector<vector<string>> events = read_stimuli_file("InputFiles/stimuli1.stim"); // Read the stimuli file
     map<string, pair<int, int>> update_values; // Store the time and value for gate updates
     int time = 0; // Initialize simulation time
     vector<string> updated_wires; // Track which wires are updated at each time step

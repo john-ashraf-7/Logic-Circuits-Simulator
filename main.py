@@ -96,56 +96,63 @@ def simulator(verilog_parsed_data, stimuli_parsed_data):
     # Initialize a data structure to store the output for each time
     simulation_results = {}
 
-    #loop through times in stim data
+    # Loop through times in stimuli data
     for time, signal_datas in stimuli_parsed_data.items():
-        #time represents the key in the dictionary.
+        # Update inputs based on the stimuli at the current time
         for signal, value in signal_datas.items():
-            verilog_parsed_data["inputs"][signal] = value #DOES THIS WORK? =========
-        #now that we got a new event, update all wires and output.
-        for gate_id, gate in verilog_parsed_data["gates"].items():
-            #save input and output wires to that gate
-            output_wire = gate["connections"][0]
-            input_wires = [wire for wire in gate["connections"][1:]] #considers all wires starting index 1
-            inputslist: list[bool] = []
-            if gate["type"] == 'not':
-                #Update outputs,wires to be the not operation of the input wires
-                for signal in input_wires:
-                    if signal in verilog_parsed_data["inputs"]:
-                        inputslist.append(verilog_parsed_data["inputs"][signal]) #append its value to the inputslist
-                    elif signal in verilog_parsed_data["wires"]:
-                        inputslist.append(verilog_parsed_data["wires"][signal])
-                if output_wire in verilog_parsed_data["wires"]:
-                    verilog_parsed_data["wires"][output_wire] = not inputslist[0]
-                elif output_wire in verilog_parsed_data["outputs"]:
-                    verilog_parsed_data["outputs"][output_wire] = not inputslist[0]
-            elif gate["type"] == 'and':
-                for signal in input_wires:
-                    if signal in verilog_parsed_data["inputs"]:
-                        inputslist.append(verilog_parsed_data["inputs"][signal]) #append its value to the inputslist
-                    elif signal in verilog_parsed_data["wires"]:
-                        inputslist.append(verilog_parsed_data["wires"][signal])
-                if output_wire in verilog_parsed_data["wires"]:
-                    verilog_parsed_data["wires"][output_wire] = all(inputslist)
-                elif output_wire in verilog_parsed_data["outputs"]:
-                    verilog_parsed_data["outputs"][output_wire] = all(inputslist)
-            elif gate["type"] == 'or':
-                for signal in input_wires:
-                    if signal in verilog_parsed_data["inputs"]:
-                        inputslist.append(verilog_parsed_data["inputs"][signal]) #append its value to the inputslist
-                    elif signal in verilog_parsed_data["wires"]:
-                        inputslist.append(verilog_parsed_data["wires"][signal])
-                if output_wire in verilog_parsed_data["wires"]:
-                    verilog_parsed_data["wires"][output_wire] = any(inputslist)
-                elif output_wire in verilog_parsed_data["outputs"]:
-                    verilog_parsed_data["outputs"][output_wire] = any(inputslist)
+            verilog_parsed_data["inputs"][signal] = value
 
-        #done doing all gate operations.
-        #put variables in a dictionary labeled by time.
+        # Process each gate to update wires and outputs
+        for gate_id, gate in verilog_parsed_data["gates"].items():
+            output_wire = gate["connections"][0]
+            input_wires = [wire for wire in gate["connections"][1:]]
+            inputslist = []
+
+            # Populate inputslist with values from inputs or wires
+            for signal in input_wires:
+                if signal in verilog_parsed_data["inputs"]:
+                    inputslist.append(verilog_parsed_data["inputs"][signal])
+                elif signal in verilog_parsed_data["wires"]:
+                    inputslist.append(verilog_parsed_data["wires"][signal])
+
+            # Handle each gate type
+            if gate["type"] == 'not':
+                result = not inputslist[0]
+
+            elif gate["type"] == 'and':
+                result = all(inputslist)
+
+            elif gate["type"] == 'or':
+                result = any(inputslist)
+
+            elif gate["type"] == 'xor':
+                result = bool(sum(inputslist) % 2)  # XOR: True if odd number of True values
+
+            elif gate["type"] == 'nand':
+                result = not all(inputslist)  # NAND: True if not all inputs are True
+
+            elif gate["type"] == 'nor':
+                result = not any(inputslist)  # NOR: True if all inputs are False
+
+            elif gate["type"] == 'xnor':
+                result = not bool(sum(inputslist) % 2)  # XNOR: True if even number of True values
+
+            elif gate["type"] == 'buf':
+                result = inputslist[0]  # BUF: Pass the input directly to the output
+
+            # Set the result in the appropriate wire or output
+            if output_wire in verilog_parsed_data["wires"]:
+                verilog_parsed_data["wires"][output_wire] = result
+            elif output_wire in verilog_parsed_data["outputs"]:
+                verilog_parsed_data["outputs"][output_wire] = result
+
+        # Store the simulation results at the current time
         simulation_results[time] = {
             "inputs": verilog_parsed_data["inputs"].copy(),
             "wires": verilog_parsed_data["wires"].copy(),
             "outputs": verilog_parsed_data["outputs"].copy()
         }
+
     return simulation_results
 
 def write_to_sim(simulation_results, output_file="output.sim"):
@@ -161,7 +168,7 @@ def write_to_sim(simulation_results, output_file="output.sim"):
 
 
 # Usage example
-circuit_num = 1
+circuit_num = input("Select circuit number to simulate: ")
 verilog_parsed_data = parse_verilog_file(circuit_num)
 # if verilog_parsed_data:
     # print(verilog_parsed_data)

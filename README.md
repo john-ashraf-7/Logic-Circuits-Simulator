@@ -2,8 +2,7 @@
 
 <h2>Description</h2>
 
-<p>An event-driven logic circuit simulator with GUI<br>
-  for editing the circuit and showing the waveforms</p>
+<p>An event-driven logic circuit simulator</p>
   
 <h2>Team members</h2>
 
